@@ -11,6 +11,7 @@ from global_config import GlobalConfig as cfg
 
 def extract_number(filename):
     match = re.search(r"(\d+)(?=\.\w+$)", filename)
+    if not match: print("[extract_number] Warning: regex failed to match")
     return int(match.group(1)) if match else float('inf')
 
 model_path = './best.pt'
@@ -90,6 +91,7 @@ def test(imgdir, output_video="output.mp4", fps=30):
         video_writer.release()       
 
 if __name__ == '__main__':
-    test('./datasets/wl_test/', fps=24)
+    # test('./datasets/wl_test/', fps=24)
+    test('./datasets/ir_test/', fps=24)
 
 
