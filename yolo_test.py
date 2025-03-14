@@ -8,11 +8,8 @@ from ultralytics import YOLO
 from UTIL.colorful import *
 from siri_utils.sleeper import Sleeper
 from global_config import GlobalConfig as cfg
+from extract_number import extract_number
 
-def extract_number(filename):
-    match = re.search(r"(\d+)(?=\.\w+$)", filename)
-    if not match: print("[extract_number] Warning: regex failed to match")
-    return int(match.group(1)) if match else float('inf')
 
 model_path = './best.pt'
 model = YOLO(model=model_path, task='detect')

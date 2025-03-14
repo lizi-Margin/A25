@@ -36,3 +36,9 @@ __pycache__/
 
 # data dirs
 /VISUALIZE_logdir
+/SUP_models
+/GAN_models
+/runs
+
+# FFA
+/FFA-Net
