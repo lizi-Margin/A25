@@ -17,8 +17,12 @@ __pycache__/
 !/datasets/.gitkeep
 
 # ultralytics
+/ultralytics*
 /ultralytics/*
 !/ultralytics/.gitkeep
+
+# third_party
+/third_party
 
 # medias
 *.mp4
@@ -27,12 +31,13 @@ __pycache__/
 
 
 # models
-/model/*
-!/model/.gitkeep
+# /yolo_model/*
+# !/yolo_model/.gitkeep
 *.pt
 
-# rar
+# zipfile
 *.rar
+*.7z
 
 # data dirs
 /VISUALIZE_logdir
