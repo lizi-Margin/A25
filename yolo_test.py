@@ -4,11 +4,11 @@ import cv2
 import numpy as np
 import supervision as sv
 from typing import Union, List
-from ultralytics import YOLO
+from third_party.ultralytics import YOLO
 from UTIL.colorful import *
 from siri_utils.sleeper import Sleeper
 from global_config import GlobalConfig as cfg
-from extract_number import extract_number
+from pre.extract_number import extract_number
 
 
 model_path = './best.pt'
@@ -33,7 +33,7 @@ def _predict(frame_or_batch: Union[np.ndarray, List[np.ndarray]]):
 
     results = model.predict(
         batch,
-        cfg=f"{cfg.root_dir}/game.yaml",
+        cfg=f"{cfg.root_dir}/yolo_model/game.yaml",
         imgsz=tuple(reversed(cfg.sz_wh)),
         stream=True,   # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! stream set
         conf=cfg.conf_threshold,

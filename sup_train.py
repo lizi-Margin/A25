@@ -9,11 +9,11 @@ from torch.utils.data import DataLoader, Dataset
 from torch.backends import cudnn
 
 from global_config import GlobalConfig as cfg
-from FFA import FFA
-from models import *
-from dataloader import GanDataset, MemGanDataset
-from transform import transform
-from model_io import save_sup_model, load_sup_model_
+from net.FFA import FFA
+# from models import *
+from pre.dataloader import GanDataset, MemGanDataset
+from pre.transform import transform
+from net.model_io import save_sup_model, load_sup_model_, load_gan_model
 
 T = 15
 init_lr = 0.006
@@ -28,7 +28,8 @@ def train(net,loader_train,optim,criterion):
 	default_pt = f"./SUP_models/model.pt"
 	losses=[]
 	start_step=0
-	net, optim = load_sup_model_(net, optim, default_pt)
+	# net, optim = load_sup_model_(net, optim, default_pt)
+	net = load_gan_model(net, default_pt)
 	for step in range(start_step+1,steps+1):
 		net.train()
 		lr=lr_schedule_cosdecay(step,T)
@@ -76,7 +77,8 @@ if __name__ == "__main__":
 		cudnn.benchmark=True
 	criterion = []
 	criterion.append(nn.L1Loss().to(cfg.device))
-	optimizer = optim.Adam(params=filter(lambda x: x.requires_grad, net.parameters()),lr=init_lr, betas = (0.9, 0.999), eps=1e-08)
+	# optimizer = optim.Adam(params=filter(lambda x: x.requires_grad, net.parameters()),lr=init_lr, betas = (0.9, 0.999), eps=1e-08)
+	optimizer = optim.SGD(params=filter(lambda x: x.requires_grad, net.parameters()),lr=init_lr)
 	optimizer.zero_grad()
 	train(net,dataloader,optimizer,criterion)
 	

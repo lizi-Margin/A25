@@ -8,10 +8,10 @@ import os
 from PIL import Image
 from global_config import GlobalConfig as cfg
 from UTIL.colorful import *
-from dataloader  import GanDataset, MemGanDataset
-from net import *
-from transform import transform
-from model_io import *
+from pre.dataloader  import GanDataset, MemGanDataset
+from net.net import *
+from pre.transform import transform
+from net.model_io import *
 
 
 

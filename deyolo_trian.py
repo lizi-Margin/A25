@@ -1,6 +1,6 @@
 import os
 import cv2
-from third_party.ultralytics import YOLO
+from third_party.DEYOLO.ultralytics import YOLO
 from global_config import GlobalConfig as cfg
 
 
@@ -24,10 +24,11 @@ def train(model, dataset_yaml):
 
 
 if __name__ == '__main__':
-    dataset_name = 'ir_yolo'
-    model_path = 'yolo11m.pt'
+    dataset_name = 'deyolo'
+    # model_path = 'yolov8n.pt'
+    model_path = 'deyolo_models/best.pt'
 
     root_dir = cfg.root_dir
-    model = YOLO(model=model_path)
+    model = YOLO(f"{root_dir}/third_party/DEYOLO/ultralytics/models/v8/DEYOLO.yaml").load(model_path)
     dataset = f'{root_dir}/datasets/{dataset_name}/data.yaml'
     train(model, dataset)

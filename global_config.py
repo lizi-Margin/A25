@@ -23,8 +23,9 @@ class GlobalConfig:
 
     root_dir = get_root_dir()
     device = 'cuda:0'
-    conf_threshold = 0.33
+    conf_threshold = 0.3
     half = False
-    sz_wh = (1280, 578)
+    # sz_wh = (1280, 578)
+    sz_wh = (640, 640)
 
     mcv = get_a_logger()

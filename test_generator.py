@@ -8,11 +8,11 @@ import numpy as np
 from global_config import GlobalConfig as cfg
 from UTIL.colorful import *
 
-from dataloader import GanDataset, MemGanDataset
-from net import *
-from FFA import FFA
-from transform import transform
-from model_io import load_gan_model
+from pre.dataloader import GanDataset, MemGanDataset
+from net.net import *
+from net.FFA import FFA
+from pre.transform import transform
+from net.model_io import load_gan_model
 
 def _post_compute(fake_images):
     fake_images = torch.clamp(fake_images, -1., 1.)
