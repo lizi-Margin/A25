@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import supervision as sv
 from typing import Union, List
-from third_party.ultralytics import YOLO
+from ultralytics import YOLO
 from UTIL.colorful import *
 from siri_utils.sleeper import Sleeper
 from global_config import GlobalConfig as cfg

@@ -1,6 +1,6 @@
 import os
 import cv2
-from third_party.ultralytics import YOLO
+from ultralytics import YOLO
 from global_config import GlobalConfig as cfg
 
 
