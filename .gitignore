@@ -19,7 +19,7 @@ __pycache__/
 # ultralytics
 /ultralytics*
 /ultralytics/*
-!/ultralytics/.gitkeep
+# !/ultralytics/.gitkeep
 
 # third_party
 /third_party
