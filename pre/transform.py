@@ -12,3 +12,12 @@ transform = transforms.Compose([
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     # FillNaNWithZero()
 ])
+
+
+
+transform_dwgan = transforms.Compose([
+    transforms.Resize((320, 320)),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+    # FillNaNWithZero()
+])

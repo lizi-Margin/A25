@@ -7,12 +7,17 @@ import cv2
 import numpy as np
 from global_config import GlobalConfig as cfg
 from UTIL.colorful import *
+from siri_utils.preprocess import combime_wl_ir
 
 from pre.dataloader import GanDataset, MemGanDataset
 from net.net import *
-from net.FFA import FFA
-from pre.transform import transform
+# from net.FFA import FFA
+from third_party.DWGAN.model import fusion_net
+from pre.transform import transform_dwgan as transform
 from net.model_io import load_gan_model
+
+def cat(input_frame, real_frame, fake_frame):
+    return combime_wl_ir(combime_wl_ir(input_frame, real_frame), fake_frame)
 
 def _post_compute(fake_images):
     fake_images = torch.clamp(fake_images, -1., 1.)
@@ -30,18 +35,22 @@ dataset = GanDataset(wl_dir, ir_dir, transform=transform)
 dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
 # generator = Generator().to(device)
-generator = FFA(gps=3,blocks=19).to(device)
-# model_path = "./GAN_models/model.pt"
-model_path = "./SUP_models/model.pt"
+generator = fusion_net().to(device)
+# generator = FFA(gps=3,blocks=19).to(device)
+model_path = "./GAN_models/model.pt"
+# model_path = "./SUP_models/model.pt"
 generator = load_gan_model(generator, model_path)
 generator.eval()
 
 output_video = "./output.mp4"
 fps = 24
 
-first_image = next(iter(dataloader))[0].to(device)
-with torch.no_grad(): first_fake_image = _post_compute(generator(first_image))
-height, width, _ = first_fake_image[0].shape
+first_batch_input, first_batch_real = next(iter(dataloader))
+first_batch_input = first_batch_input.to(device)
+with torch.no_grad(): first_fake = _post_compute(generator(first_batch_input))[0]
+first_input = _post_compute(first_batch_input)[0]
+first_real = _post_compute(first_batch_real)[0]
+height, width, _ = cat(first_input, first_real, first_fake).shape
 
 fourcc = cv2.VideoWriter_fourcc(*"mp4v")
 video_writer = cv2.VideoWriter(output_video, fourcc, fps, (width, height))
@@ -59,7 +68,7 @@ try:
                 input_frame = cv2.cvtColor(input_images[i], cv2.COLOR_RGB2BGR)
                 fake_frame = cv2.cvtColor(fake_images[i], cv2.COLOR_RGB2BGR)
                 real_frame = cv2.cvtColor(real_images[i], cv2.COLOR_RGB2BGR)
-                video_writer.write(fake_frame)
+                video_writer.write(cat(input_frame, real_frame, fake_frame))
                 # video_writer.write(input_frame)
                 print绿(f"\rProcessing batch: {k}", end='')
 finally:

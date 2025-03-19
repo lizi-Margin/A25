@@ -15,7 +15,7 @@ def save_sup_model(gen, opt_G, pt_path,info=None):
         'opt_G': opt_G.state_dict(),
     }, pt_path)
 
-def load_sup_model_(gen,  opt_G, pt_path,info=None):
+def load_sup_model_(gen,  opt_G, pt_path):
     if not os.path.exists(pt_path): 
         assert False, "file does not exists"
 
@@ -35,7 +35,7 @@ def save_gan_model(gen, dis, opt_G, opt_D, pt_path,info=None):
         'opt_D': opt_D.state_dict(),
     }, pt_path)
 
-def load_gan_model_(gen, dis, opt_G, opt_D, pt_path,info=None):
+def load_gan_model_(gen, dis, opt_G, opt_D, pt_path):
     if not os.path.exists(pt_path): 
         assert False, "file does not exists"
 
@@ -48,7 +48,7 @@ def load_gan_model_(gen, dis, opt_G, opt_D, pt_path,info=None):
     return gen, dis, opt_G, opt_D
 
 
-def load_gan_model(gen, pt_path,info=None):
+def load_gan_model(gen, pt_path):
     if not os.path.exists(pt_path): 
         assert False, "file does not exists"
 

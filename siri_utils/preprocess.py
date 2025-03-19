@@ -306,3 +306,17 @@ def embed_image_in_black_bg(small_img, target_height):
     # 将小图像嵌入到黑色背景中
     black_bg[start_y:start_y + small_height, :] = small_img
     return black_bg
+
+
+def combime_wl_ir(wl_frame, ir_frame):
+    wl_height, wl_width = wl_frame.shape[:2]
+    ir_height, ir_width = ir_frame.shape[:2]
+    if wl_height > ir_height:
+        ir_frame = embed_image_in_black_bg(ir_frame, wl_height)
+    else:
+        wl_frame = embed_image_in_black_bg(wl_frame, ir_height)
+    combined_frame = np.hstack((wl_frame, ir_frame))
+    MAX_WIDTH = 1200
+    if combined_frame.shape[1] > MAX_WIDTH:
+        combined_frame = resize_image_to_width(combined_frame, MAX_WIDTH)
+    return combined_frame

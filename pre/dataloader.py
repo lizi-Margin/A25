@@ -1,4 +1,5 @@
 import torch, cv2
+from tqdm import tqdm
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
@@ -22,6 +23,7 @@ class GanDataset(Dataset):
     def __len__(self):
         return self.length()
     def length(self):
+        # return int(min(len(self.wl_files), len(self.ir_files)) / 10)
         return min(len(self.wl_files), len(self.ir_files))
 
     def __getitem__(self, idx):
@@ -53,7 +55,7 @@ class GanDataset(Dataset):
 class MemGanDataset(GanDataset):
     def __init__(self, wl_dir, ir_dir, transform=None):
         super().__init__(wl_dir, ir_dir, transform)
-        self.mem = [self.get(i) for i in range(self.length())]
+        self.mem = [self.get(i) for i in tqdm(range(self.length()), desc="Loading dataset into memory")]
 
     def __getitem__(self, idx):
         return self.mem[idx]
@@ -80,7 +82,7 @@ class DEYOLO_Dataset(GanDataset):
 class MemDEYOLO_Dataset(DEYOLO_Dataset):
     def __init__(self, wl_dir, ir_dir, transform=None):
         super().__init__(wl_dir, ir_dir, transform)
-        self.mem = [self.get(i) for i in range(self.length())]
+        self.mem = [self.get(i) for i in tqdm(range(self.length()), desc="Loading dataset into memory")]
 
     def __getitem__(self, idx):
         return self.mem[idx]

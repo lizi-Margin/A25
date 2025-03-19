@@ -11,20 +11,9 @@ from global_config import GlobalConfig as cfg
 from pre.extract_number import extract_number
 from pre.dataloader import DEYOLO_Dataset
 from torch.utils.data import DataLoader
-from siri_utils.preprocess import embed_image_in_black_bg, resize_image_to_width
+from siri_utils.preprocess import combime_wl_ir
 
-def combime_wl_ir(wl_frame, ir_frame):
-    wl_height, wl_width = wl_frame.shape[:2]
-    ir_height, ir_width = ir_frame.shape[:2]
-    if wl_height > ir_height:
-        ir_frame = embed_image_in_black_bg(ir_frame, wl_height)
-    else:
-        wl_frame = embed_image_in_black_bg(wl_frame, ir_height)
-    combined_frame = np.hstack((wl_frame, ir_frame))
-    MAX_WIDTH = 1200
-    if combined_frame.shape[1] > MAX_WIDTH:
-        combined_frame = resize_image_to_width(combined_frame, MAX_WIDTH)
-    return combined_frame
+
 
 
 model_path = './deyolo_models/best.pt'
@@ -67,7 +56,7 @@ def _predict(frame_or_batch):
         # show_boxes=False,
         # show_labels=False,
         # show_conf=False,
-        save=True,
+        save=False,
         show=False,
         # batch=1
     )
