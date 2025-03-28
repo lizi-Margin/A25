@@ -34,6 +34,8 @@ __pycache__/
 # /yolo_model/*
 # !/yolo_model/.gitkeep
 *.pt
+*.pth
+*.pkl
 
 # zipfile
 *.rar

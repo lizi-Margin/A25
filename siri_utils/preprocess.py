@@ -320,3 +320,12 @@ def combime_wl_ir(wl_frame, ir_frame):
     if combined_frame.shape[1] > MAX_WIDTH:
         combined_frame = resize_image_to_width(combined_frame, MAX_WIDTH)
     return combined_frame
+
+
+
+def _post_compute(fake_images):
+    fake_images = torch.clamp(fake_images, -1., 1.)
+    fake_images = (fake_images + 1) / 2.0  # [-1, 1] -> [0, 1]
+    fake_images = fake_images.cpu().numpy().transpose(0, 2, 3, 1) * 255
+    fake_images = fake_images.astype(np.uint8)
+    return fake_images

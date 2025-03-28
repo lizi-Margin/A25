@@ -15,6 +15,7 @@ from third_party.DWGAN.pytorch_msssim import msssim
 from third_party.DWGAN.perceptual import LossNetwork
 from third_party.DWGAN.model import fusion_net, Discriminator
 from siri_utils.mcv_log_manager import LogManager
+from wl_to_color import wl_to_color
 
 import warnings
 warnings.simplefilter("ignore", UserWarning)
@@ -22,16 +23,18 @@ warnings.simplefilter("ignore", UserWarning)
 
 batch_size = 14
 epochs = 50000000000
-lr_G = 0.0001
+lr_G = 0.00001
 lr_D = 0.0001
 device = cfg.device
 
 
-wl_dir = './datasets/wl_test/'
-ir_dir = './datasets/ir_test/'
-dataset = MemGanDataset(wl_dir, ir_dir, transform=transform)
-# dataset = GanDataset(wl_dir, ir_dir, transform=transform)
-dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+def get_dataloader():
+    wl_dir = './datasets/wl_test/'
+    ir_dir = './datasets/ir_test/'
+    dataset = MemGanDataset(wl_dir, ir_dir, transform=transform)
+    # dataset = GanDataset(wl_dir, ir_dir, transform=transform)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    return dataloader
 
 # --- Define the network --- #
 MyEnsembleNet = fusion_net()
@@ -70,8 +73,11 @@ msssim_loss = msssim
 
 mcv_manager = LogManager(cfg.mcv)
 
+reuse = 2
 for epoch in range(epochs):
     print(f'Epoch [{epoch}/{epochs}] starts')
+    if epoch % reuse == 0:
+        dataloader = get_dataloader()
     start_time = time.time()
     MyEnsembleNet.train()
     DNet.train()
@@ -82,6 +88,8 @@ for epoch in range(epochs):
         # print(f'\r batch={i}, batch_size={batch_size}',end='')
         wl_images = wl_images.to(device)
         ir_images = ir_images.to(device)
+        wl_images = wl_to_color(wl_images)
+        ir_images = wl_to_color(ir_images)
         output = MyEnsembleNet(wl_images)
         DNet.zero_grad()
         real_out = DNet(ir_images).mean()

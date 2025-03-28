@@ -16,7 +16,9 @@ transform = transforms.Compose([
 
 
 transform_dwgan = transforms.Compose([
-    transforms.Resize((320, 320)),
+    # transforms.Resize((320, 320)),
+    transforms.Resize((256, 256)),
+    # transforms.Resize((560, 752)),
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     # FillNaNWithZero()

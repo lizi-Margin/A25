@@ -1,8 +1,8 @@
-import torch, cv2
+import torch, cv2, random
 from tqdm import tqdm
 import torch.nn as nn
-import torch.optim as optim
 import numpy as np
+import torchvision.transforms.functional as F
 from torchvision import transforms
 from torch.utils.data import DataLoader, Dataset
 import os
@@ -10,6 +10,28 @@ from PIL import Image
 from global_config import GlobalConfig as cfg
 from UTIL.colorful import *
 from pre.extract_number import extract_number
+
+
+train = False
+def transform_pair(img1, img2):
+    if not train:
+        return img1, img2
+
+    width, height = img1.shape[-2:]
+    angle = random.uniform(-10, 10) 
+    scale = random.uniform(0.95, 1.6) 
+    translate_coef = 0.25
+    translate = (int(random.uniform(-translate_coef, translate_coef) * width), int(random.uniform(-translate_coef, translate_coef) * height))
+    hflip = random.random() > 0.5 
+
+    img1 = F.affine(img1, angle=angle, translate=translate, scale=scale, shear=0)
+    img2 = F.affine(img2, angle=angle, translate=translate, scale=scale, shear=0)
+
+    if hflip:
+        img1 = F.hflip(img1)
+        img2 = F.hflip(img2)
+
+    return img1, img2
 
 
 class GanDataset(Dataset):
@@ -40,6 +62,7 @@ class GanDataset(Dataset):
         if self.transform:
             wl_img = self.transform(wl_img)
             ir_img = self.transform(ir_img)
+            wl_img, ir_img = transform_pair(wl_img, ir_img)
             assert isinstance(wl_img, torch.Tensor)
             assert isinstance(ir_img, torch.Tensor)  # RGB
 
@@ -86,3 +109,58 @@ class MemDEYOLO_Dataset(DEYOLO_Dataset):
 
     def __getitem__(self, idx):
         return self.mem[idx]
+
+
+
+class MemVidGanDataset(Dataset):
+    def __init__(self, wl_vid, ir_vid=None, transform=None):
+        assert os.path.isfile(wl_vid)
+
+        self.wl_vid = wl_vid
+        self.ir_vid = ir_vid
+        self.transform = transform
+        self.wl_mem = self._extract_frames(wl_vid)
+ 
+    
+    def _extract_frames(self, video_path):
+        frames = []
+        cap = cv2.VideoCapture(video_path)
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        with tqdm(total=total_frames, desc=f"Extracting frames from {video_path}") as pbar:
+            while cap.isOpened():
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frames.append(self._get(frame))
+                pbar.update(1)
+                # if pbar.n  > 500: break
+        cap.release()
+        return frames
+    
+    def _get(self, array_frame):
+        wl_img = Image.fromarray(array_frame)
+        
+        if self.transform:
+            wl_img = self.transform(wl_img)
+            wl_img, _ = transform_pair(wl_img, torch.zeros_like(wl_img))
+            assert isinstance(wl_img, torch.Tensor)
+
+            assert not torch.any(torch.isnan(wl_img)), str(wl_img)
+        else:
+            wl_img = np.array(wl_img)
+            wl_img = cv2.cvtColor(wl_img, cv2.COLOR_RGB2BGR)  
+        return wl_img
+
+
+    def __len__(self):
+        return len(self.wl_mem)
+    
+    def __getitem__(self, idx):
+        wl = self.wl_mem[idx]
+        if isinstance(wl, torch.Tensor):
+            ir = torch.zeros_like(wl).to(wl.device)
+        elif isinstance(wl, np.ndarray):
+            ir = np.zeros_like(wl)
+        else: assert False
+        return wl, ir
